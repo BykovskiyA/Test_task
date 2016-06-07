@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Provide mouse device functionality
+/// </summary
 public class MouseController : InputController
 {
     Vector2 m_lastMousePos;
@@ -15,6 +18,9 @@ public class MouseController : InputController
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Update mause state each frame
+    /// </summary
     void Update ()
     {
         Vector2 curPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
@@ -32,6 +38,9 @@ public class MouseController : InputController
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Reset device state to default
+    /// </summary
     public override void ResetState()
     {
         m_lastMousePos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
@@ -41,12 +50,18 @@ public class MouseController : InputController
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Difference of X screen position from previouse frame
+    /// </summary
     public override float GetOffsetXFromPrevFrame()
     {
         return m_mousePosDiff.x;
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Difference of Y screen position from previouse frame
+    /// </summary
     public override float GetOffsetYFromPrevFrame()
     {
         return m_mousePosDiff.y;

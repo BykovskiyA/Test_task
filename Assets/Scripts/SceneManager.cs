@@ -3,8 +3,14 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Scane manager. Provade base functionality with application posible state. Can be extended with callback actuions for flexibility.
+/// </summary
 public class SceneManager : MonoBehaviour
 {
+    /// <summary>
+    /// Application base states. Any state change can be provided with virtual callback.
+    /// </summary
     enum SceneState
     {
         Unknown,
@@ -15,36 +21,53 @@ public class SceneManager : MonoBehaviour
         LooseGame,
         WinGame,
         SceneDelay,
-        LevelRun
+        LevelRun,
+        ScaneStateNumer
     }
 
     SceneState m_prevGameState; // not used, but for additional purpose in change states
-    SceneState m_curGameState;
-    SceneState m_newGameState;
+    SceneState m_curGameState;  // current application state
+    SceneState m_newGameState;  // next application state
 
-    public Transform    m_sceneRoot;
-    public Text         m_quastionField;
+    public Transform    m_sceneRoot;        // parent for all dynamic 3d objects
+    public Text         m_quastionField;    // text view for user quastion, can be removed in childs for better virtualizaion
 
-    public GameObject   m_answerObjPrefab;
+    public GameObject   m_answerObjPrefab;  // prefab for dynamicly created answer object
     List<GameObject>    m_answerSceneObjects = new List<GameObject>(); // interactive answer objects
 
     int m_levelID; // level number/difficulty
 
-    public float m_fAnswerObjectsRadius = 3.0f;
-    int m_iCorrectAnswerID = -1;
+    public float m_fAnswerObjectsRadius = 3.0f; // object rotation radius
+    int m_iCorrectAnswerID = -1;                // id of correct answer
 
-    CursorManager       m_cursorManager;
-    CaptureHitManager   m_captureManager = new CaptureHitManager();
+    CursorManager       m_cursorManager;        // cursor manager
+    CaptureHitManager   m_captureManager = new CaptureHitManager(); // object action 
+
+    public Camera   m_baseCamera;       // camera used in usual visuality mode
+    public Camera[] m_stereoCamera;     // cameras used in stereo mode
 
     //----------------------------------------------------------------------------------------
     void Start ()
     {
+        #if USE_STEREO
+            m_baseCamera.enabled = false;
+            foreach(var camIter in m_stereoCamera)
+            camIter.enabled = true;
+        #else
+            m_baseCamera.enabled = true;
+            foreach (var camIter in m_stereoCamera)
+            camIter.enabled = false;
+        #endif
+
         m_levelID = 0;
         m_prevGameState = SceneState.Unknown;
         m_curGameState = SceneState.Unknown;
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Init scene state, register callbacks
+    /// </summary
     void InitScene()
     {
         m_cursorManager = GetComponent<CursorManager>();
@@ -60,7 +83,9 @@ public class SceneManager : MonoBehaviour
     }
 
     //----------------------------------------------------------------------------------------
-    // check scene state machine
+    /// <summary>
+    /// Update state of scene state machine
+    /// </summary
     void Update ()
     {
         if (m_newGameState == m_curGameState)
@@ -111,6 +136,9 @@ public class SceneManager : MonoBehaviour
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Set scene in new state
+    /// </summary
     void UpdateLevelState(SceneState newState)
     {
         m_prevGameState = m_curGameState;
@@ -119,12 +147,20 @@ public class SceneManager : MonoBehaviour
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Update cursor with scene objets interaction
+    /// </summary
     void UpdateCapture()
     {
         int iHitedID = -1;
         RaycastHit hitResult = new RaycastHit();
         Vector2 vieportPoint = m_cursorManager.GetCursorPos();
-        Ray hitRay = Camera.main.ViewportPointToRay(new Vector3(vieportPoint.x + 0.5f, vieportPoint.y + 0.5f, 0.0f));
+
+        #if USE_STEREO
+            Ray hitRay = m_stereoCamera[0].ViewportPointToRay(new Vector3(vieportPoint.x + 0.5f, vieportPoint.y + 0.5f, 0.0f));
+        #else
+            Ray hitRay = m_baseCamera.ViewportPointToRay(new Vector3(vieportPoint.x + 0.5f, vieportPoint.y + 0.5f, 0.0f));
+        #endif
 
         if (Physics.Raycast(hitRay, out hitResult))
         {
@@ -138,7 +174,9 @@ public class SceneManager : MonoBehaviour
     }
 
     //----------------------------------------------------------------------------------------
-    // callback run when the object is pressed
+    /// <summary>
+    /// Callback run when the object is pressed
+    /// </summary
     void PressedActionCallback(int iID)
     {
         m_newGameState = SceneState.SceneDelay;
@@ -147,6 +185,9 @@ public class SceneManager : MonoBehaviour
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Coroutin for merge animation and few scene states in same time
+    /// </summary
     IEnumerator DelayedChangeState(int iID)
     {
         yield return new WaitForSeconds(2);
@@ -156,20 +197,27 @@ public class SceneManager : MonoBehaviour
         
     }
     //----------------------------------------------------------------------------------------
-    // callback run when cursor on the object hover in/out
+    /// <summary>
+    /// Callback run when cursor on the object hover in/out(object selection)
+    /// </summary
     void HoverActionCallback(int iID, bool isIn)
     {
         m_answerSceneObjects[iID].GetComponent<CubeProperty>().SetState(isIn ? CubeProperty.CubeState.Over : CubeProperty.CubeState.Normal);
     }
 
     //----------------------------------------------------------------------------------------
-    // any animation used when level is running
+    /// <summary>
+    /// Scene animation update
+    /// </summary
     void UpdateSceneAnimation()
     {
         m_sceneRoot.Rotate(Vector3.up, Time.deltaTime*(4.0f + m_levelID));
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Clearing scene data
+    /// </summary
     void ClearSceneData()
     {
         m_captureManager.UnregisterObjects();
@@ -182,6 +230,9 @@ public class SceneManager : MonoBehaviour
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Create scene objects
+    /// </summary
     void FillSceneWithObjects()
     {
         ExpresionGenerator opsGenerator = new ExpresionGenerator(m_levelID);

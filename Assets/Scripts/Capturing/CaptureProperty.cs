@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// The addition of this class(as component) will allow the project to send messages from the cursor
+/// </summary
 public class CaptureProperty : MonoBehaviour
 {
     int             m_iCaptureID = -1;
@@ -23,12 +26,18 @@ public class CaptureProperty : MonoBehaviour
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Register callback
+    /// </summary
     public void RegisterCallback(ActionCallback actionReciver)
     {
         m_ActionCallback = actionReciver;
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Happen when cusror enter in object region
+    /// </summary
     public void ObjectWasCaptured()
     {
         if (m_bCaptured)
@@ -39,12 +48,18 @@ public class CaptureProperty : MonoBehaviour
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Happen when cusror leave object region
+    /// </summary
     public void ObjectWasMissed()
     {
         m_bCaptured = false;
     }
-    
+
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Update object state
+    /// </summary
     void Update ()
     {
         if (!m_bCaptured || !m_bActive)

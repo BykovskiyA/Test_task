@@ -1,18 +1,25 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+//----------------------------------------------------------------------------------------
+/// <summary>
+/// Update, change scene objects with cursor action
+/// </summary
 public class CaptureHitManager
 {
     List<GameObject> m_captureFactory = new List<GameObject>();
 
     public delegate void ActionCallback(int iID);
     public delegate void ActionHoverCallback(int iID, bool bIn);
-    protected ActionCallback m_actionCallback;
-    protected ActionHoverCallback m_actionHoverCallback;
+    protected ActionCallback m_actionCallback;              // press action (not used, can be used for muose ot touch)
+    protected ActionHoverCallback m_actionHoverCallback;    // hover action
 
     int m_iLastCapturedID = -1;
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Callback registrator
+    /// </summary
     public void RegisterActionCallbacks(ActionCallback actionCallback, ActionHoverCallback actionHoverCallback)
     {
         m_actionCallback = actionCallback;
@@ -20,6 +27,9 @@ public class CaptureHitManager
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Object registartion that send action message
+    /// </summary
     public void RegisterObject(GameObject go, int iID)
     {
         CaptureProperty objCaptureProperty = go.GetComponent<CaptureProperty>();
@@ -30,6 +40,9 @@ public class CaptureHitManager
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Object unregistartion
+    /// </summary
     public void UnregisterObjects()
     {
         m_iLastCapturedID = -1;
@@ -38,6 +51,9 @@ public class CaptureHitManager
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Object registartion that send action message
+    /// </summary
     public void UpdateCapturedObjects(int iCurCapturedID)
     {
         if (m_iLastCapturedID == iCurCapturedID)
@@ -73,10 +89,4 @@ public class CaptureHitManager
         if (m_actionCallback != null)
             m_actionCallback(iID);
     }
-
-    //----------------------------------------------------------------------------------------
-    void Update ()
-    {
-	
-	}
 }

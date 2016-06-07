@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+//----------------------------------------------------------------------------------------
+/// <summary>
+/// Game object propery
+/// </summary
 public class CubeProperty : MonoBehaviour
 {
     public enum CubeState
@@ -13,16 +17,16 @@ public class CubeProperty : MonoBehaviour
         Unknown
     };
 
-    public TextMesh[]   m_textView;
-    public Color[]      m_colorState;
+    public TextMesh[]   m_textView;     // text on object faces
+    public Color[]      m_colorState;   // color associated with the state
 
-    CubeState           m_curCubeState;
-    float               m_fRotation = 0.0f;
-    Transform           m_objTM;
+    CubeState           m_curCubeState;     // curent state
+    float               m_fRotation = 0.0f; // current rotation
+    Transform           m_objTM;            // transform cash
 
-    int                 m_id;
-    float               m_fBlinkTime;
-    bool                m_bBlinked;
+    int                 m_id;               // object id(for external use)
+    float               m_fBlinkTime;       // time from blink start
+    bool                m_bBlinked;         // blink state on/off
 
     //----------------------------------------------------------------------------------------
     void Start ()
@@ -31,6 +35,9 @@ public class CubeProperty : MonoBehaviour
 	}
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Init object base state
+    /// </summary
     public void ResetState(int iID, string sText, float fMinRot, float fMaxRot)
     {
         m_curCubeState = CubeState.Unknown;
@@ -43,12 +50,18 @@ public class CubeProperty : MonoBehaviour
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Return object id
+    /// </summary
     public int GetID()
     {
         return m_id;
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Udate object state
+    /// </summary
     void Update ()
     {
         if(m_bBlinked)
@@ -56,6 +69,7 @@ public class CubeProperty : MonoBehaviour
             m_fBlinkTime += Time.deltaTime*2.0f*Mathf.PI;
             float fKoef = (Mathf.Sin(m_fBlinkTime) + 1.5f)*(1.0f / 2.5f);
             Color objColor = m_colorState[(int)m_curCubeState] * fKoef;
+            objColor.a = 1.0f;
             SetColor(objColor);
         }
 
@@ -66,12 +80,18 @@ public class CubeProperty : MonoBehaviour
 	}
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    ///Set object rotation speed
+    /// </summary
     void ApplyRotation(float fSpeed)
     {
         m_fRotation = fSpeed;
     }
 
     //----------------------------------------------------------------------------------------
+    /// <summary>
+    ///Set object new state
+    /// </summary
     public void SetState(CubeState newState)
     {
         if (m_curCubeState == newState)
