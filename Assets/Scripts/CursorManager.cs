@@ -12,10 +12,7 @@ public class CursorManager : MonoBehaviour
     Vector2 m_screenSize;
 
     public RawImage m_cursorTex;
-
-    #if USE_STEREO
-        public RawImage m_cursorTex2;
-    #endif
+    public RawImage m_cursorTex2;
 
     //----------------------------------------------------------------------------------------
     void Start ()
